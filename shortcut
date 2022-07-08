@@ -118,7 +118,7 @@ if match?([], System.argv()) do
   IO.puts("""
   shortcut  - commandline Shortcut API Integration
             - Operates on current story by default
-            - Uses git to obtain story id from current branch name
+            - Obtains current story ID from current git branch name
   Usage:
   new title [description]         Create new story with title and optional description
   projects                        List all projects. Use with jq for pretty output, i.e. shorcut projects | jq '.[] | {name: .name, id: .id}'
@@ -128,7 +128,7 @@ if match?([], System.argv()) do
   label storyId labelName         Applies label 'labelName' to story with id 'storyId'
   """)
 
-  Process.exit(self(), 1)
+  Process.exit(self(), 0)
 end
 
 [action | args] = System.argv()
