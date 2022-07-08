@@ -8,11 +8,12 @@ defmodule Shortcut do
   @api_version "v3"
   @api_url "https://api.app.shortcut.com/api/#{@api_version}"
   @shortcut_token System.fetch_env!("SHORTCUT_TOKEN")
-  @project_id to_string(System.get_env("SHORTCUT_PROJECT", @allegro_id)) # Allegro id == 4
+  # Allegro id == 4
+  @project_id to_string(System.get_env("SHORTCUT_PROJECT", @allegro_id))
   @headers %{"content-type" => "application/json", "shortcut-token" => @shortcut_token}
 
   def new do
-    IO.puts "new requires at least a name argument. Usage: shortcut new title [description]"
+    IO.puts("new requires at least a name argument. Usage: shortcut new title [description]")
   end
 
   def new(name) do
@@ -27,11 +28,11 @@ defmodule Shortcut do
     }
 
     case post("stories", body) do
-      {:ok, story} ->
-        IO.inspect story
+      {:ok, %{body: body}} ->
+        IO.write(body)
 
       {:error, error} ->
-        IO.inspect error
+        IO.inspect(error)
     end
   end
 
@@ -41,7 +42,7 @@ defmodule Shortcut do
         IO.write(body)
 
       {:error, error} ->
-        IO.inspect error
+        IO.inspect(error)
     end
   end
 
@@ -54,14 +55,16 @@ defmodule Shortcut do
   end
 end
 
-if match?([], System.argv) do
-  IO.puts """
+if match?([], System.argv()) do
+  IO.puts("""
   shortcut - commandline Shortcut API Integration
   Usage:
   new title [description]         Create new story with title and optional description
   projects                        List all projects. Use with jq for pretty output, i.e. shorcut projects | jq '.[] | {name: .name, id: .id}'
-  """
+  """)
+
   Process.exit(self(), 1)
 end
-[action | args] = System.argv
+
+[action | args] = System.argv()
 apply(Shortcut, String.to_atom(action), args)
