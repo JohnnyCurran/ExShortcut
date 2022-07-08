@@ -30,6 +30,9 @@ defmodule Shortcut do
     IO.write(post("stories", body))
   end
 
+  # How do we implement this ergonomically on the CLI? options flags? --label --thingy --????
+  # def update(...) do
+
   def projects do
     IO.puts(get("projects"))
   end
