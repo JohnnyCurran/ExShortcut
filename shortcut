@@ -52,7 +52,7 @@ defmodule Shortcut do
     label =
       labels()
       |> Jason.decode!()
-      |> Enum.find(&String.downcase(&1) == name)
+      |> Enum.find(&String.downcase(&1["name"]) == name)
       |> create_label_params()
 
     story_id = storyid()
