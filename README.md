@@ -1,5 +1,13 @@
 # Shortcut CLI
 
+## Install
+```bash
+git clone git@github.com:JohnnyCurran/ExShortcut.git
+cd ExShortcut
+sudo ln -s `echo $PWD/shortcut` /usr/local/bin/shortcut
+shortcut
+```
+
 ## Usage
 Obtain your Shortcut token from https://app.shortcut.com/settings/account/api-tokens
 Set `SHORTCUT_TOKEN` as an env var:
@@ -53,9 +61,10 @@ shortcut labels
 shortcut label 12345 bugfix
 ```
 
-## Git integration
+## Github integration
 
-If you use suggested shortcut branches for git integration, Shortcut will automatically read the story ID from the current branch name
+If you use the suggested shortcut branch names for github integration, Shortcut will automatically read the story ID from the current branch name.
+
 For example, to label your current story with `bugfix`, simply:
 
 ```bash
