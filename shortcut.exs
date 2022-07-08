@@ -10,8 +10,8 @@ defmodule Shortcut do
   @project_id System.fetch_env("SHORTCUT_PROJECT") || 4 # Allegro id == 4
   @headers %{"content-type" => "application/json", "shortcut-token" => @shortcut_token}
 
-  def new([]) do
-    raise "new requires at least a name argument. Usage: shortcut new 'Card Name'"
+  def new do
+    IO.puts "new requires at least a name argument. Usage: shortcut new title [description]"
   end
 
   def new(name) do
@@ -53,6 +53,14 @@ defmodule Shortcut do
   end
 end
 
-unless [action | args] = System.argv, do: raise("Requires at least one argument. Example: shortcut new")
-
+if match?([], System.argv) do
+  IO.puts """
+  shortcut - commandline Shortcut API Integration
+  Usage:
+  new title [description]         Create new story with title and optional description
+  projects                        List all projects. Use with jq for pretty output, i.e. shorcut projects | jq '.[] | {name: .name, id: .id}'
+  """
+  Process.exit(self(), 1)
+end
+[action | args] = System.argv
 apply(Shortcut, String.to_atom(action), args)
