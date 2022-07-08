@@ -7,6 +7,7 @@ defmodule Shortcut do
   @api_version "v3"
   @api_url "https://api.app.shortcut.com/api/#{@api_version}"
   @shortcut_token System.fetch_env!("SHORTCUT_TOKEN")
+  @project_id System.fetch_env("SHORTCUT_PROJECT") || 4 # Allegro id == 4
   @headers %{"content-type" => "application/json", "shortcut-token" => @shortcut_token}
 
   def new([]) do
@@ -20,10 +21,11 @@ defmodule Shortcut do
   def new(name, description) do
     body = %{
       name: name,
-      description: description
+      description: description,
+      project_id: @project_id
     }
 
-    case request("stories", body) do
+    case post("stories", body) do
       {:ok, story} ->
         IO.inspect story
 
@@ -32,8 +34,22 @@ defmodule Shortcut do
     end
   end
 
-  defp request(endpoint, body) do
+  def projects do
+    case get("projects") do
+      {:ok, %{body: body}} ->
+        IO.write(body)
+
+      {:error, error} ->
+        IO.inspect error
+    end
+  end
+
+  defp post(endpoint, body) do
     HTTPoison.post("#{@api_url}/#{endpoint}", Jason.encode!(body), @headers)
+  end
+
+  defp get(endpoint) do
+    HTTPoison.get("#{@api_url}/#{endpoint}", @headers)
   end
 end
 
