@@ -27,11 +27,8 @@ defmodule Shortcut do
       project_id: @project_id
     }
 
-    IO.write(post("stories", body))
+    IO.puts(post("stories", body))
   end
-
-  # How do we implement this ergonomically on the CLI? options flags? --label --thingy --????
-  # def update(...) do
 
   def projects do
     IO.puts(get("projects"))
@@ -45,10 +42,9 @@ defmodule Shortcut do
     IO.puts(get("labels"))
   end
 
-  # Branch name example: jc/sc-11932/set-up-goals-by-department-hierarchy-account
   def storyid do
     [_owner, "sc-" <> story_id | _rest] = String.split(Git.current_branch, "/")
-    IO.puts(story_id)
+    story_id
   end
 
   defp post(endpoint, body) do
