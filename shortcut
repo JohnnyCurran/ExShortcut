@@ -27,24 +27,64 @@ defmodule Shortcut do
       project_id: @project_id
     }
 
-    IO.puts(post("stories", body))
+    post("stories", body)
+  end
+
+  def label(story_id, name) do
+    # Search all labels for name (downcase compare) & then apply that label
+    label =
+      labels()
+      |> Jason.decode!()
+      |> Enum.find(&String.downcase(&1["name"]) == name)
+      |> create_label_params()
+
+    body = %{
+      "labels" => [label],
+      "project_id" => @project_id,
+      "story-public-id" => story_id
+    }
+
+    put("stories/#{story_id}", body)
+  end
+
+  def label(name) do
+    # Search all labels for name (downcase compare) & then apply that label
+    label =
+      labels()
+      |> Jason.decode!()
+      |> Enum.find(&String.downcase(&1) == name)
+      |> create_label_params()
+
+    story_id = storyid()
+
+    body = %{
+      "labels" => [label],
+      "project_id" => @project_id,
+      "story-public-id" => story_id
+    }
+
+    put("stories/#{story_id}", body)
   end
 
   def projects do
-    IO.puts(get("projects"))
+    get("projects")
   end
 
   def whoami do
-    IO.puts(get("member"))
+    get("member")
   end
 
   def labels do
-    IO.puts(get("labels"))
+    get("labels")
   end
 
   def storyid do
     [_owner, "sc-" <> story_id | _rest] = String.split(Git.current_branch, "/")
     story_id
+  end
+
+  defp create_label_params(label) do
+    Map.take(label, ["color", "description", "name"])
   end
 
   defp post(endpoint, body) do
@@ -54,6 +94,11 @@ defmodule Shortcut do
 
   defp get(endpoint) do
     HTTPoison.get("#{@api_url}/#{endpoint}", @headers)
+    |> normalize_response()
+  end
+
+  defp put(endpoint, body) do
+    HTTPoison.put("#{@api_url}/#{endpoint}", Jason.encode!(body), @headers)
     |> normalize_response()
   end
 
@@ -86,3 +131,4 @@ end
 
 [action | args] = System.argv()
 apply(Shortcut, String.to_atom(action), args)
+|> IO.puts()
