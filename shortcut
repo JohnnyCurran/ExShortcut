@@ -5,15 +5,14 @@ Mix.install([
 ])
 
 defmodule Shortcut do
-  @allegro_id "4"
   @api_version "v3"
   @api_url "https://api.app.shortcut.com/api/#{@api_version}"
   @shortcut_token System.fetch_env!("SHORTCUT_TOKEN")
-  @project_id to_string(System.get_env("SHORTCUT_PROJECT", @allegro_id))
+  @project_id System.fetch_env!("SHORTCUT_PROJECT_ID")
   @headers %{"content-type" => "application/json", "shortcut-token" => @shortcut_token}
 
   def new do
-    IO.puts("new requires at least a name argument. Usage: shortcut new title [description]")
+    IO.puts("Usage: shortcut new title [description]")
   end
 
   def new(name) do
@@ -114,7 +113,7 @@ defmodule Git do
 
 end
 
-if match?([], System.argv()) do
+if System.argv() == [] do
   IO.puts("""
   shortcut  - commandline Shortcut API Integration
             - Operates on current story by default
