@@ -27,32 +27,33 @@ defmodule Shortcut do
       project_id: @project_id
     }
 
-    case post("stories", body) do
-      {:ok, %{body: body}} ->
-        IO.write(body)
-
-      {:error, error} ->
-        IO.inspect(error)
-    end
+    IO.write(post("stories", body))
   end
 
   def projects do
-    case get("projects") do
-      {:ok, %{body: body}} ->
-        IO.write(body)
+    IO.puts(get("projects"))
+  end
 
-      {:error, error} ->
-        IO.inspect(error)
-    end
+  def whoami do
+    IO.puts(get("member"))
+  end
+
+  def labels do
+    IO.puts(get("labels"))
   end
 
   defp post(endpoint, body) do
     HTTPoison.post("#{@api_url}/#{endpoint}", Jason.encode!(body), @headers)
+    |> normalize_response()
   end
 
   defp get(endpoint) do
     HTTPoison.get("#{@api_url}/#{endpoint}", @headers)
+    |> normalize_response()
   end
+
+  defp normalize_response({:ok, %{body: body}}), do: body
+  defp normalize_response({:error, error}), do: error
 end
 
 if match?([], System.argv()) do
@@ -61,6 +62,8 @@ if match?([], System.argv()) do
   Usage:
   new title [description]         Create new story with title and optional description
   projects                        List all projects. Use with jq for pretty output, i.e. shorcut projects | jq '.[] | {name: .name, id: .id}'
+  whoami                          List info of the authenticated shortcut member from SHORTCUT_TOKEN
+  labels                          List labels and their attributes
   """)
 
   Process.exit(self(), 1)
