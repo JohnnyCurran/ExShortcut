@@ -7,7 +7,11 @@ defmodule Shortcut do
   @api_version "v3"
   @api_url "https://api.app.shortcut.com/api/#{@api_version}"
   @shortcut_token System.fetch_env!("SHORTCUT_TOKEN")
-  @headers %{"content-type" => "application/json", "shortcut-token", @shortcut_token}
+  @headers %{"content-type" => "application/json", "shortcut-token" => @shortcut_token}
+
+  def new([]) do
+    raise "new requires at least a name argument. Usage: shortcut new 'Card Name'"
+  end
 
   def new(name) do
     new(name, "")
@@ -28,17 +32,11 @@ defmodule Shortcut do
     end
   end
 
-  def new(_) do
-    raise "new requires at least a name argument. Usage: shortcut new 'Card Name'"
-  end
-
-  defp request(endpoint) do
-    HTTPoision.
+  defp request(endpoint, body) do
+    HTTPoison.post("#{@api_url}/#{endpoint}", Jason.encode!(body), @headers)
   end
 end
 
 unless [action | args] = System.argv, do: raise("Requires at least one argument. Example: shortcut new")
-# We want at least 2 args
-IO.inspect action
 
 apply(Shortcut, String.to_atom(action), args)
