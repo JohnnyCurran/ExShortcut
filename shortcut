@@ -22,9 +22,9 @@ defmodule Shortcut do
 
   def new(name, description) do
     body = %{
-      name: name,
-      description: description,
-      project_id: @project_id
+      "name" => name,
+      "description" => description,
+      "project_id" => @project_id
     }
 
     post("stories", body)
@@ -124,6 +124,8 @@ if match?([], System.argv()) do
   projects                        List all projects. Use with jq for pretty output, i.e. shorcut projects | jq '.[] | {name: .name, id: .id}'
   whoami                          List info of the authenticated shortcut member from SHORTCUT_TOKEN
   labels                          List labels and their attributes
+  label labelName                 Applies label 'labelName' to story from current branch
+  label storyId labelName         Applies label 'labelName' to story with id 'storyId'
   """)
 
   Process.exit(self(), 1)
