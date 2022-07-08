@@ -4,10 +4,11 @@ Mix.install([
 ])
 
 defmodule Shortcut do
+  @allegro_id "4"
   @api_version "v3"
   @api_url "https://api.app.shortcut.com/api/#{@api_version}"
   @shortcut_token System.fetch_env!("SHORTCUT_TOKEN")
-  @project_id System.fetch_env("SHORTCUT_PROJECT") || 4 # Allegro id == 4
+  @project_id to_string(System.get_env("SHORTCUT_PROJECT", @allegro_id)) # Allegro id == 4
   @headers %{"content-type" => "application/json", "shortcut-token" => @shortcut_token}
 
   def new do
