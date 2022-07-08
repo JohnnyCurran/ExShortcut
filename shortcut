@@ -45,6 +45,12 @@ defmodule Shortcut do
     IO.puts(get("labels"))
   end
 
+  # Branch name example: jc/sc-11932/set-up-goals-by-department-hierarchy-account
+  def storyid do
+    [_owner, "sc-" <> story_id | _rest] = String.split(Git.current_branch, "/")
+    IO.puts(story_id)
+  end
+
   defp post(endpoint, body) do
     HTTPoison.post("#{@api_url}/#{endpoint}", Jason.encode!(body), @headers)
     |> normalize_response()
@@ -59,9 +65,19 @@ defmodule Shortcut do
   defp normalize_response({:error, error}), do: error
 end
 
+defmodule Git do
+  def current_branch do
+    {branch, 0} = System.cmd("git", ["branch", "--show-current"])
+    branch
+  end
+
+end
+
 if match?([], System.argv()) do
   IO.puts("""
-  shortcut - commandline Shortcut API Integration
+  shortcut  - commandline Shortcut API Integration
+            - Operates on current story by default
+            - Uses git to obtain story id from current branch name
   Usage:
   new title [description]         Create new story with title and optional description
   projects                        List all projects. Use with jq for pretty output, i.e. shorcut projects | jq '.[] | {name: .name, id: .id}'
