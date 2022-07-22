@@ -15,6 +15,10 @@ Set `SHORTCUT_TOKEN` as an env var:
 ```bash
 export SHORTCUT_TOKEN=my_shortcut_token
 ```
+(optional) If you'd like to default search (stories, epics) to a certain project, set `SHORTCUT_PROJECT_NAME`:
+```bash
+export SHORTCUT_PROJECT_NAME=my_project
+```
 (optional) If you know the project ID you want to work on, set `SHORTCUT_PROJECT_ID`
 ```bash
 export SHORTCUT_PROJECT_ID=my_project_id

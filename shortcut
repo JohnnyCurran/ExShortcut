@@ -8,11 +8,12 @@ defmodule Shortcut do
   @api_version "v3"
   @api_url "https://api.app.shortcut.com/api/#{@api_version}"
   @shortcut_token System.fetch_env!("SHORTCUT_TOKEN")
+  @project_name System.get_env("SHORTCUT_PROJECT_NAME")
   @project_id System.get_env("SHORTCUT_PROJECT_ID")
   @headers %{"content-type" => "application/json", "shortcut-token" => @shortcut_token}
 
   def new do
-    IO.puts("Usage: shortcut new title [description]")
+    "Usage: shortcut new title [description]"
   end
 
   def new(name) do
@@ -82,6 +83,15 @@ defmodule Shortcut do
     story_id
   end
 
+  def stories(state) do
+    search_parameters =
+      %{
+        "project" => @project_name,
+        "state" => state
+      }
+    search(search_parameters)
+  end
+
   defp create_label_params(label) do
     Map.take(label, ["color", "description", "name"])
   end
@@ -101,6 +111,24 @@ defmodule Shortcut do
     |> normalize_response()
   end
 
+  defp search(search_parameters_map) do
+    body =
+      search_parameters_map
+      |> Enum.map(fn
+        {_operator, nil} ->
+          ""
+
+        {operator, value} ->
+        "#{operator}:#{value}"
+      end)
+      |> Enum.join(" ")
+      |> then(& %{"query" => &1})
+      |> Jason.encode!()
+
+    HTTPoison.request(:get, "#{@api_url}/search", body, @headers)
+    |> normalize_response()
+  end
+
   defp normalize_response({:ok, %{body: body}}), do: body
   defp normalize_response({:error, error}), do: error
 end
@@ -110,7 +138,6 @@ defmodule Git do
     {branch, 0} = System.cmd("git", ["branch", "--show-current"])
     branch
   end
-
 end
 
 if System.argv() == [] do
@@ -125,11 +152,15 @@ if System.argv() == [] do
   labels                          List labels and their attributes
   label labelName                 Applies label 'labelName' to story from current branch
   label storyId labelName         Applies label 'labelName' to story with id 'storyId'
+  storyid                         Returns the Story ID of the current branch you are working on
+  stories state                   Return stories with state 'state'. If SHORTCUT_PROJECT_NAME is set, only stories from that project will be returned
+                                  Example: shortcut stories 'merged' | jq '.stories.data | .[] | .app_url'
   """)
 
   Process.exit(self(), 0)
 end
 
 [action | args] = System.argv()
-apply(Shortcut, String.to_atom(action), args)
+Shortcut
+|> apply(String.to_atom(action), args)
 |> IO.puts()
