@@ -46,6 +46,9 @@ whoami                          List info of the authenticated shortcut member f
 labels                          List labels and their attributes
 label labelName                 Applies label 'labelName' to story from current branch
 label storyId labelName         Applies label 'labelName' to story with id 'storyId'
+storyid                         Returns the Story ID of the current branch you are working on
+stories state                   Return stories with state 'state'. If SHORTCUT_PROJECT_NAME is set, only stories from that project will be returned
+                                  Example: shortcut stories 'merged' | jq '.stories.data | .[] | .app_url'
 ```
 
 ## Examples
